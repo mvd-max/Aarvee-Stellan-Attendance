@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Factory Attendance System</title>
+
+<style>
+
+body{
+    margin:0;
+    padding:0;
+    background:#f2f2f2;
+    font-family:Arial;
+}
+
+.box{
+    width:380px;
+    margin:40px auto;
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    text-align:center;
+    box-shadow:0 0 15px rgba(0,0,0,.2);
+}
+
+h2{
+    color:#0d6efd;
+}
+
+h3{
+    margin-top:5px;
+}
+
+.info{
+    margin:15px 0;
+    padding:10px;
+    background:#f5f5f5;
+    border-radius:8px;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    border:none;
+    color:white;
+    font-size:17px;
+    border-radius:8px;
+    cursor:pointer;
+    margin-top:12px;
+}
+
+#inBtn{
+    background:#198754;
+}
+
+#outBtn{
+    background:#dc3545;
+}
+
+#msg{
+    margin-top:20px;
+    font-weight:bold;
+    color:green;
+}
+
+#location{
+    color:#0d6efd;
+    font-size:14px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>🏭 Factory Attendance</h2>
+
+<h3 id="empName"></h3>
+
+<div class="info">
+
+<p>📅 <span id="date"></span></p>
+
+<p>🕒 <span id="clock"></span></p>
+
+<p id="location">
+📍 Waiting for Location...
+</p>
+
+</div>
+
+<button id="inBtn" onclick="punchIn()">
+🟢 Punch In
+</button>
+
+<button id="outBtn" onclick="punchOut()">
+🔴 Punch Out
+</button>
+
+<p id="msg"></p>
+
+</div>
+
+<script>
+
+setInterval(function(){
+
+document.getElementById("clock").innerHTML=
+new Date().toLocaleTimeString();
+
+document.getElementById("date").innerHTML=
+new Date().toLocaleDateString();
+
+},1000);
+
+</script>
+
+<script src="attendance.js"></script>
+
+</body>
+</html>
