@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 
 <meta charset="UTF-8">
-<title>Stellan/Aarvee Attendance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>સ્ટેલન / આરવી હાજરી સિસ્ટમ</title>
 
 <style>
 
 body{
-    font-family:Arial;
+    margin:0;
+    padding:0;
     background:#f2f2f2;
+    font-family:Arial,sans-serif;
     display:flex;
     justify-content:center;
     align-items:center;
@@ -17,46 +22,59 @@ body{
 }
 
 .box{
-    background:white;
-    padding:30px;
-    width:400px;
-    border-radius:10px;
-    box-shadow:0 0 10px gray;
+    width:420px;
+    background:#fff;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 0 15px rgba(0,0,0,.2);
     text-align:center;
 }
 
-select,button{
+h2{
+    color:#0066cc;
+    margin-bottom:20px;
+    font-size:28px;
+}
+
+select{
     width:100%;
-    padding:12px;
+    padding:15px;
+    font-size:20px;
+    border-radius:8px;
+    margin-top:10px;
+}
+
+button{
+    width:100%;
+    padding:15px;
     margin-top:15px;
-    font-size:16px;
+    font-size:22px;
+    font-weight:bold;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
 }
 
 #inBtn{
-    background:green;
+    background:#1c9c2d;
     color:white;
-    border:none;
 }
 
 #outBtn{
-    background:red;
+    background:#d62828;
     color:white;
-    border:none;
-}
-
-#video,#preview{
-    width:100%;
-    margin-top:10px;
-    border-radius:10px;
 }
 
 #location{
     margin-top:15px;
-    font-size:14px;
+    font-size:18px;
+    color:#333;
+    font-weight:bold;
 }
 
 #msg{
-    margin-top:15px;
+    margin-top:20px;
+    font-size:22px;
     font-weight:bold;
 }
 
@@ -68,35 +86,49 @@ select,button{
 
 <div class="box">
 
-<h2>Stellan/Aarvee Attendance System</h2>
+<h2>📋 સ્ટેલન / આરવી હાજરી સિસ્ટમ</h2>
 
 <select id="employee">
 
-<option value="">Select Employee</option>
+<option value="">કર્મચારી પસંદ કરો</option>
 
-<option value="101|Sajid Ansari">101 - Sajid Ansari</option>
-<option value="102|Mansingh Shreenivas">102 - Mansingh Shreenivas</option>
-<option value="103|Senva Sanjay kumar">103 - Senva Sanjay kumar</option>
-<option value="104|Sushant Shekhar Podar">104 - Sushant Shekhar Podar</option>
-<option value="105|Amit Podar">105 - Amit Podar</option>
-<option value="106|Solanki Dhiraj Bhai">106 - Solanki Dhiraj Bhai</option>
-<option value="107|Vinod Gajjar">107 - Vinod Gajjar</option>
-<option value="108|Avinash">108 - Avinash</option>
-<option value="109|Hardik Prajapati">109 - Hardik Prajapati</option>
-<option value="110|Pravin Singh">110 - Pravin Singh</option>
-<option value="111|Arjun Singh">111 - Arjun Singh</option>
-<option value="112|Vinayak Patil">112 - Vinayak Patil</option>
-<option value="113|Malek Javed Miya">113 - Malek Javed Miya</option>
-<option value="114|Anil Zala">114 - Anil Zala</option>
-<option value="115|Kamlesh Vaghri">115 - Kamlesh Vaghri</option>
+<option value="101|સાજીદ અન્સારી">101 - સાજીદ અન્સારી</option>
+
+<option value="102|માનસિંહ શ્રીનિવાસ">102 - માનસિંહ શ્રીનિવાસ</option>
+
+<option value="103|સેનવા સંજયકુમાર">103 - સેનવા સંજયકુમાર</option>
+
+<option value="104|સુશાંત શેખર પોદાર">104 - સુશાંત શેખર પોદાર</option>
+
+<option value="105|અમિત પોદાર">105 - અમિત પોદાર</option>
+
+<option value="106|સોલંકી ધીરજભાઈ">106 - સોલંકી ધીરજભાઈ</option>
+
+<option value="107|વિનોદ ગજ્જર">107 - વિનોદ ગજ્જર</option>
+
+<option value="108|અવિનાશ">108 - અવિનાશ</option>
+
+<option value="109|હાર્દિક પ્રજાપતિ">109 - હાર્દિક પ્રજાપતિ</option>
+
+<option value="110|પ્રવીણ સિંહ">110 - પ્રવીણ સિંહ</option>
+
+<option value="111|અર્જુન સિંહ">111 - અર્જુન સિંહ</option>
+
+<option value="112|વિનાયક પાટીલ">112 - વિનાયક પાટીલ</option>
+
+<option value="113|મલેક જાવેદ મિયા">113 - મલેક જાવેદ મિયા</option>
+
+<option value="114|અનિલ ઝાલા">114 - અનિલ ઝાલા</option>
+
+<option value="115|કમલેશ વાઘરી">115 - કમલેશ વાઘરી</option>
 
 </select>
 
 <p id="location"></p>
 
-<button id="inBtn" onclick="punchIn()">Punch In</button>
+<button id="inBtn" onclick="punchIn()">🟢 આવ્યા</button>
 
-<button id="outBtn" onclick="punchOut()">Punch Out</button>
+<button id="outBtn" onclick="punchOut()">🔴 ગયા</button>
 
 <p id="msg"></p>
 
@@ -105,4 +137,5 @@ select,button{
 <script src="attendance.js"></script>
 
 </body>
+
 </html>
