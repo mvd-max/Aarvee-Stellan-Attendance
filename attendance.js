@@ -4,6 +4,8 @@ let latitude = "";
 let longitude = "";
 let address = "";
 
+let stream = null;
+let selfieImage = "";
 // ==========================
 // Get GPS + Address
 // ==========================
@@ -61,6 +63,9 @@ function getLocation(callback) {
 // ==========================
 // Punch In
 // ==========================
+// ==========================
+// Punch In
+// ==========================
 async function punchIn() {
 
     const emp = document.getElementById("employee").value;
@@ -70,12 +75,41 @@ async function punchIn() {
         return;
     }
 
+    if (selfieImage == "") {
+        alert("Please Capture Selfie First");
+        return;
+    }
+
     const arr = emp.split("|");
     const employeeId = arr[0];
     const name = arr[1];
 
     getLocation(async function () {
 
+        let selfieUrl = "";
+
+        // Upload Selfie
+        const upload = await fetch(WEBAPP, {
+
+            method: "POST",
+
+            body: JSON.stringify({
+
+                action: "uploadselfie",
+                employeeId: employeeId,
+                image: selfieImage
+
+            })
+
+        });
+
+        const uploadResult = await upload.json();
+
+        if (uploadResult.success) {
+            selfieUrl = uploadResult.url;
+        }
+
+        // Punch In
         const response = await fetch(WEBAPP, {
 
             method: "POST",
@@ -85,7 +119,8 @@ async function punchIn() {
                 action: "punchin",
                 employeeId: employeeId,
                 name: name,
-                address: address
+                address: address,
+                selfieUrl: selfieUrl
 
             })
 
@@ -99,7 +134,6 @@ async function punchIn() {
     });
 
 }
-
 // ==========================
 // Punch Out
 // ==========================
@@ -129,7 +163,40 @@ async function punchOut() {
         })
 
     });
+async function openCamera() {
 
+    stream = await navigator.mediaDevices.getUserMedia({
+        video: true
+    });
+
+    const video = document.getElementById("video");
+
+    video.srcObject = stream;
+    video.style.display = "block";
+}
+
+function capturePhoto() {
+
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const preview = document.getElementById("preview");
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    canvas.getContext("2d").drawImage(video, 0, 0);
+
+    selfieImage = canvas.toDataURL("image/jpeg").split(",")[1];
+
+    preview.src = "data:image/jpeg;base64," + selfieImage;
+    preview.style.display = "block";
+
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+    }
+
+    video.style.display = "none";
+}
     const result = await response.json();
 
     document.getElementById("msg").innerHTML =
