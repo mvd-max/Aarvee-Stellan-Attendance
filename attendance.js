@@ -2,16 +2,21 @@ const WEBAPP = "https://script.google.com/macros/s/AKfycbz-ffVMBmyW9HRxfzadHbo-7
 
 let latitude = "";
 let longitude = "";
+let gpsReady = false;
 
-// ==========================
-// GPS
-// ==========================
 function getLocation(callback) {
+
+    if (gpsReady) {
+        callback();
+        return;
+    }
 
     if (!navigator.geolocation) {
         document.getElementById("location").innerHTML = "📍 GPS ઉપલબ્ધ નથી";
         return;
     }
+
+    document.getElementById("location").innerHTML = "📍 સ્થાન મેળવી રહ્યા છીએ...";
 
     navigator.geolocation.getCurrentPosition(
 
@@ -19,146 +24,158 @@ function getLocation(callback) {
 
             latitude = position.coords.latitude;
             longitude = position.coords.longitude;
+            gpsReady = true;
 
             document.getElementById("location").innerHTML = "📍 સ્થાન તૈયાર છે";
+
             callback();
 
         },
 
         function(error) {
 
-            alert("📍 કૃપા કરીને Location ચાલુ કરો");
             console.log(error);
+
+            document.getElementById("location").innerHTML =
+                "❌ Location મળી નથી";
+
+            alert("Location મળી નથી. કૃપા કરીને GPS ON રાખો.");
 
         },
 
         {
             enableHighAccuracy: false,
-            timeout: 2000,
-            maximumAge: 300000
+            timeout:10000,
+            maximumAge:600000
         }
 
     );
-
 }
 
-// ==========================
-// આવ્યા (Punch In)
-// ==========================
-async function punchIn() {
+window.onload = function () {
+    getLocation(function(){});
+};
 
-    const btn = document.getElementById("inBtn");
-    btn.disabled = true;
-    btn.innerHTML = "થોડી રાહ જુઓ...";
+async function punchIn(){
 
-    const emp = document.getElementById("employee").value;
+    const btn=document.getElementById("inBtn");
 
-    if (emp == "") {
-        alert("કૃપા કરીને કર્મચારી પસંદ કરો");
-        btn.disabled = false;
-        btn.innerHTML = "🟢 આવ્યા";
+    btn.disabled=true;
+    btn.innerHTML="થોડી રાહ જુઓ...";
+
+    const emp=document.getElementById("employee").value;
+
+    if(emp==""){
+
+        alert("કર્મચારી પસંદ કરો");
+
+        btn.disabled=false;
+        btn.innerHTML="🟢 આવ્યા";
         return;
     }
 
-    const arr = emp.split("|");
+    const arr=emp.split("|");
 
-    getLocation(async function () {
+    const sendData=async()=>{
 
-        try {
+        try{
 
-            const response = await fetch(WEBAPP, {
-
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-
-                    action: "punchin",
-                    employeeId: arr[0],
-                    name: arr[1],
-                    latitude: latitude,
-                    longitude: longitude
-
+            const response=await fetch(WEBAPP,{
+                method:"POST",
+                body:JSON.stringify({
+                    action:"punchin",
+                    employeeId:arr[0],
+                    name:arr[1],
+                    latitude:latitude,
+                    longitude:longitude
                 })
-
             });
 
-            const result = await response.json();
+            const result=await response.json();
 
-            document.getElementById("msg").innerHTML =
-                result.success
-                ? "✅ હાજરી સફળતાપૂર્વક નોંધાઈ"
-                : "❌ " + result.message;
+            document.getElementById("msg").innerHTML=result.success
+            ?"✅ હાજરી સફળતાપૂર્વક નોંધાઈ"
+            :"❌ "+result.message;
 
-        } catch (e) {
+        }catch(e){
 
-            document.getElementById("msg").innerHTML = "❌ સર્વર સાથે સંપર્ક થઈ શક્યો નથી";
+            document.getElementById("msg").innerHTML="❌ Server સાથે સંપર્ક થઈ શક્યો નથી";
 
         }
 
-        btn.disabled = false;
-        btn.innerHTML = "🟢 આવ્યા";
+        btn.disabled=false;
+        btn.innerHTML="🟢 આવ્યા";
+    };
 
-    });
+    if(gpsReady){
 
-}
+        sendData();
 
-// ==========================
-// ગયા (Punch Out)
-// ==========================
-async function punchOut() {
+    }else{
 
-    const btn = document.getElementById("outBtn");
-    btn.disabled = true;
-    btn.innerHTML = "થોડી રાહ જુઓ...";
+        getLocation(function(){
 
-    const emp = document.getElementById("employee").value;
-
-    if (emp == "") {
-        alert("કૃપા કરીને કર્મચારી પસંદ કરો");
-        btn.disabled = false;
-        btn.innerHTML = "🔴 ગયા";
-        return;
-    }
-
-    const arr = emp.split("|");
-
-    try {
-
-        const response = await fetch(WEBAPP, {
-
-            method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify({
-
-                action: "punchout",
-                employeeId: arr[0]
-
-            })
+            sendData();
 
         });
 
-        const result = await response.json();
+        setTimeout(function(){
 
-        document.getElementById("msg").innerHTML =
-            result.success
-            ? "✅ બહાર જવાની નોંધ થઈ ગઈ"
-            : "❌ " + result.message;
+            if(!gpsReady){
 
-    } catch (e) {
+                btn.disabled=false;
+                btn.innerHTML="🟢 આવ્યા";
 
-        document.getElementById("msg").innerHTML = "❌ સર્વર સાથે સંપર્ક થઈ શક્યો નથી";
+            }
+
+        },11000);
 
     }
 
-    btn.disabled = false;
-    btn.innerHTML = "🔴 ગયા";
+}
 
+async function punchOut(){
+
+    const btn=document.getElementById("outBtn");
+
+    btn.disabled=true;
+    btn.innerHTML="થોડી રાહ જુઓ...";
+
+    const emp=document.getElementById("employee").value;
+
+    if(emp==""){
+
+        alert("કર્મચારી પસંદ કરો");
+
+        btn.disabled=false;
+        btn.innerHTML="🔴 ગયા";
+        return;
+    }
+
+    const arr=emp.split("|");
+
+    try{
+
+        const response=await fetch(WEBAPP,{
+            method:"POST",
+            body:JSON.stringify({
+                action:"punchout",
+                employeeId:arr[0]
+            })
+        });
+
+        const result=await response.json();
+
+        document.getElementById("msg").innerHTML=result.success
+        ?"✅ બહાર જવાની નોંધ થઈ ગઈ"
+        :"❌ "+result.message;
+
+    }catch(e){
+
+        document.getElementById("msg").innerHTML="❌ Server સાથે સંપર્ક થઈ શક્યો નથી";
+
+    }
+
+    btn.disabled=false;
+    btn.innerHTML="🔴 ગયા";
 }
