@@ -2,64 +2,24 @@ const WEBAPP = "https://script.google.com/macros/s/AKfycbz-ffVMBmyW9HRxfzadHbo-7
 
 let latitude = "";
 let longitude = "";
-let address = "";
 
-// ==========================
-// Get GPS + Address
-// ==========================
-function getLocation(callback) {
-
-    if (!navigator.geolocation) {
-        document.getElementById("location").innerHTML = "GPS Not Supported";
-        return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-
-        async function(position) {
-
+// Website ખુલે ત્યારે એક વખત GPS લો
+window.onload = function () {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
             latitude = position.coords.latitude;
             longitude = position.coords.longitude;
+            document.getElementById("location").innerHTML = "📍 GPS Ready";
+        }, function () {
+            document.getElementById("location").innerHTML = "Location Permission Denied";
+        }, {
+            enableHighAccuracy: false,
+            timeout: 2000,
+            maximumAge: 300000
+        });
+    }
+};
 
-            try {
-
-                const response = await fetch(
-                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-                );
-
-                const data = await response.json();
-
-                address = data.display_name;
-
-                document.getElementById("location").innerHTML = "📍 " + address;
-
-            } catch {
-
-                address = latitude + "," + longitude;
-
-                document.getElementById("location").innerHTML =
-                    "📍 Location Captured";
-
-            }
-
-            callback();
-
-        },
-
-        function() {
-
-            document.getElementById("location").innerHTML =
-                "Location Permission Denied";
-
-        }
-
-    );
-
-}
-
-// ==========================
-// Punch In
-// ==========================
 async function punchIn() {
 
     const emp = document.getElementById("employee").value;
@@ -70,38 +30,27 @@ async function punchIn() {
     }
 
     const arr = emp.split("|");
-    const employeeId = arr[0];
-    const name = arr[1];
 
-    getLocation(async function () {
-
-        const response = await fetch(WEBAPP, {
-
-            method: "POST",
-
-            body: JSON.stringify({
-
-                action: "punchin",
-                employeeId: employeeId,
-                name: name,
-                address: address
-
-            })
-
-        });
-
-        const result = await response.json();
-
-        document.getElementById("msg").innerHTML =
-            result.success ? "✅ Punch In Successful" : "❌ " + result.message;
-
+    const response = await fetch(WEBAPP, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            action: "punchin",
+            employeeId: arr[0],
+            name: arr[1],
+            latitude: latitude,
+            longitude: longitude
+        })
     });
 
+    const result = await response.json();
+
+    document.getElementById("msg").innerHTML =
+        result.success ? "✅ Punch In Successful" : "❌ " + result.message;
 }
 
-// ==========================
-// Punch Out
-// ==========================
 async function punchOut() {
 
     const emp = document.getElementById("employee").value;
@@ -112,24 +61,20 @@ async function punchOut() {
     }
 
     const arr = emp.split("|");
-    const employeeId = arr[0];
 
     const response = await fetch(WEBAPP, {
-
         method: "POST",
-
+        headers: {
+            "Content-Type": "application/json"
+        },
         body: JSON.stringify({
-
             action: "punchout",
-            employeeId: employeeId
-
+            employeeId: arr[0]
         })
-
     });
 
     const result = await response.json();
 
     document.getElementById("msg").innerHTML =
         result.success ? "✅ Punch Out Successful" : "❌ " + result.message;
-
 }
