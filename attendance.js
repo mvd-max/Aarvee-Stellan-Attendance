@@ -1,3 +1,4 @@
+alert("NEW JS LOADED");
 const WEBAPP = "https://script.google.com/macros/s/AKfycbz-ffVMBmyW9HRxfzadHbo-7-RAhRmF-UXP_WE6QZ3qLDojYL2aeSUR0ulZoh4HZWMl/exec";
 
 let latitude = "";
