@@ -4,8 +4,6 @@ let latitude = "";
 let longitude = "";
 let address = "";
 
-let stream = null;
-let selfieImage = "";
 // ==========================
 // Get GPS + Address
 // ==========================
@@ -33,8 +31,7 @@ function getLocation(callback) {
 
                 address = data.display_name;
 
-                document.getElementById("location").innerHTML =
-                    "📍 " + address;
+                document.getElementById("location").innerHTML = "📍 " + address;
 
             } catch {
 
@@ -63,18 +60,12 @@ function getLocation(callback) {
 // ==========================
 // Punch In
 // ==========================
-
 async function punchIn() {
 
     const emp = document.getElementById("employee").value;
 
-    if (emp == "") {
+    if (emp === "") {
         alert("Please Select Employee");
-        return;
-    }
-
-    if (selfieImage == "") {
-        alert("Please Capture Selfie First");
         return;
     }
 
@@ -84,30 +75,6 @@ async function punchIn() {
 
     getLocation(async function () {
 
-        let selfieUrl = "";
-
-        // Upload Selfie
-        const upload = await fetch(WEBAPP, {
-
-            method: "POST",
-
-            body: JSON.stringify({
-
-                action: "uploadselfie",
-                employeeId: employeeId,
-                image: selfieImage
-
-            })
-
-        });
-
-        const uploadResult = await upload.json();
-
-        if (uploadResult.success) {
-            selfieUrl = uploadResult.url;
-        }
-
-        // Punch In
         const response = await fetch(WEBAPP, {
 
             method: "POST",
@@ -117,8 +84,7 @@ async function punchIn() {
                 action: "punchin",
                 employeeId: employeeId,
                 name: name,
-                address: address,
-                selfieUrl: selfieUrl
+                address: address
 
             })
 
@@ -132,6 +98,7 @@ async function punchIn() {
     });
 
 }
+
 // ==========================
 // Punch Out
 // ==========================
@@ -139,14 +106,13 @@ async function punchOut() {
 
     const emp = document.getElementById("employee").value;
 
-    if (emp == "") {
+    if (emp === "") {
         alert("Please Select Employee");
         return;
     }
 
     const arr = emp.split("|");
     const employeeId = arr[0];
-    const name = arr[1];
 
     const response = await fetch(WEBAPP, {
 
@@ -155,8 +121,7 @@ async function punchOut() {
         body: JSON.stringify({
 
             action: "punchout",
-            employeeId: employeeId,
-            name: name
+            employeeId: employeeId
 
         })
 
@@ -167,48 +132,4 @@ async function punchOut() {
     document.getElementById("msg").innerHTML =
         result.success ? "✅ Punch Out Successful" : "❌ " + result.message;
 
-}
-
-
-// ==========================
-// Open Camera
-// ==========================
-async function openCamera() {
-
-    stream = await navigator.mediaDevices.getUserMedia({
-        video: true
-    });
-
-    const video = document.getElementById("video");
-
-    video.srcObject = stream;
-    video.style.display = "block";
-}
-
-
-// ==========================
-// Capture Photo
-// ==========================
-function capturePhoto() {
-
-    const video = document.getElementById("video");
-    const canvas = document.getElementById("canvas");
-    const preview = document.getElementById("preview");
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(video, 0, 0);
-
-    selfieImage = canvas.toDataURL("image/jpeg").split(",")[1];
-
-    preview.src = "data:image/jpeg;base64," + selfieImage;
-    preview.style.display = "block";
-
-    if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-    }
-
-    video.style.display = "none";
 }
