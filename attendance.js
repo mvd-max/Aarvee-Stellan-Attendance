@@ -63,9 +63,7 @@ function getLocation(callback) {
 // ==========================
 // Punch In
 // ==========================
-// ==========================
-// Punch In
-// ==========================
+
 async function punchIn() {
 
     const emp = document.getElementById("employee").value;
@@ -163,6 +161,18 @@ async function punchOut() {
         })
 
     });
+
+    const result = await response.json();
+
+    document.getElementById("msg").innerHTML =
+        result.success ? "✅ Punch Out Successful" : "❌ " + result.message;
+
+}
+
+
+// ==========================
+// Open Camera
+// ==========================
 async function openCamera() {
 
     stream = await navigator.mediaDevices.getUserMedia({
@@ -175,6 +185,10 @@ async function openCamera() {
     video.style.display = "block";
 }
 
+
+// ==========================
+// Capture Photo
+// ==========================
 function capturePhoto() {
 
     const video = document.getElementById("video");
@@ -184,7 +198,8 @@ function capturePhoto() {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
-    canvas.getContext("2d").drawImage(video, 0, 0);
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0);
 
     selfieImage = canvas.toDataURL("image/jpeg").split(",")[1];
 
@@ -196,10 +211,4 @@ function capturePhoto() {
     }
 
     video.style.display = "none";
-}
-    const result = await response.json();
-
-    document.getElementById("msg").innerHTML =
-        result.success ? "✅ Punch Out Successful" : "❌ " + result.message;
-
 }
